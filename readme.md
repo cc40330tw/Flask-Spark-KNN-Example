@@ -25,6 +25,16 @@
 
 
 
+已知可能 bug :
+
+1. 已有在 spark container 內串過了，需要把 ``import final`` 取消註解
+   和更改 ``test.KNN() -> final.KNN()``
+   不過 ``buildin_iris`` 的選項還沒跑過
+2. container 必須要有對應 port : ``-p 5678:5000``，
+   且 container 內的 flask app 必須帶有參數 ``host='0.0.0.0'`` 才能正常在 host 吃到
+   (這個參數已經在 code 中了)
+3. 網頁端執行參數不可為空。
+
 
 
 ------------------------------------
