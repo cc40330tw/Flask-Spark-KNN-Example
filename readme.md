@@ -6,16 +6,22 @@
 
 此 Proj 目前還沒完成，先說使用方式 : 
 
-1. ``final.py`` 本身可以在有裝 Spark 的 Docker Container 內跑
+1. ``final.py`` 可以在有裝 Spark 的 Docker Container 內跑
   如果你想 demo，得改一下  ``SPARK_HOME`` 的 path
   以及 ``KNN()`` -> ``KNN('buildin_iris')``
 2. 若想要 demo flask 的部分， ``python app.py``，然後去 ``localhost:5000`` 就能看到了。
-  不過關於要串 KNN function 的話得把 flask 一起放到 docker 內執行，故暫時使用 ``test.py`` 代替
+  不過關於要串 KNN function 的話得把 flask 一起放到 docker 內執行，
+  故暫時使用 ``test.py`` 代替，實際上並還沒實際測試過配合 ``final.py``
   總之打開網頁，然後輸入參數，他應該至少能正常的展示 POST Method。
 
 
 
 待完成 : 
+
+1. (傳入參數, 回傳的分數) 以此 pair 記錄至 DB 中，並且可以透過前端查詢
+2. 提供更多對於 KNN 參數之調整
+   - 不同計算距離方式，加入至前端提供選擇
+   - 可以上傳自己的 txt file
 
 
 
@@ -23,7 +29,7 @@
 
 ------------------------------------
 
-以下其餘筆記
+以下其餘筆記，跟 Proj 內的 code 倒是無關
 
 # 快速入門關於 python sklearn 的相關函數
 
