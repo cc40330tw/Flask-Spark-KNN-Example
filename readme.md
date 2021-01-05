@@ -5,11 +5,16 @@
 # 如何使用
 
 此 Proj 目前還沒完成，先說使用方式 : 
-
-1. ``final.py`` 可以在有裝 Spark 的 Docker Container 內跑
-  如果你想 demo，得改一下  ``SPARK_HOME`` 的 path
-  以及 ``KNN()`` -> ``KNN('buildin_iris')``
-2. 若想要 demo flask 的部分， ``python app.py``，然後去 ``localhost:5000`` 就能看到了。
+1. 環境建置 : 
+   - 此 repo 提供的 docker-composer 可以建一個我用的，``docker-composer up``
+     - 執行此指令請在英文目錄底下，因為因為他的 Name 會參照該目錄 ...
+   - 在 Docker 內 / 或是你的電腦環境，可以先跑一次 ``pip install -r requirements.txt``
+2. 如果只想 demo KNN with Spark，
+  可以在有裝 Spark 的 Docker Container 內跑 (記得將 ``KNN()`` 取消註解)
+  ``python final.py``
+    - 其中，因為環境不同，可能得改一下  ``SPARK_HOME`` 的 path
+    - 以及如果沒有下載 ``dis.txt``，想使用內建的 Lib，可以將 ``KNN()`` -> ``KNN('buildin_iris')``
+3. 若想要 demo flask 的部分， ``python app.py``，然後去 ``localhost:5000`` 就能看到了。
   不過關於要串 KNN function 的話得把 flask 一起放到 docker 內執行，
   故暫時使用 ``test.py`` 代替，實際上並還沒實際測試過配合 ``final.py``
   總之打開網頁，然後輸入參數，他應該至少能正常的展示 POST Method。
