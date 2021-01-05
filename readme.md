@@ -6,7 +6,7 @@
 
 此 Proj 目前還沒完成，先說使用方式 : 
 1. 環境建置 : 
-   - 此 repo 提供的 docker-composer 可以建一個我用的，``docker-composer up``
+   - 此 repo 提供的 docker-composer 可以建一個我用的，``docker-compose up``
      - 執行此指令請在英文目錄底下，因為因為他的 Name 會參照該目錄 ...
    - 在 Docker 內 / 或是你的電腦環境，可以先跑一次 ``pip install -r requirements.txt``
 2. 如果只想 demo KNN with Spark，
