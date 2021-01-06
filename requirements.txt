@@ -2,3 +2,5 @@ py4j
 numpy
 flask
 sklearn
+pymysql
+flask_sqlalchemy

@@ -1,5 +1,23 @@
 
 
+python flask : 前端 + 後端
+
+Spark : 數據處理
+
+MariaDB : 數據儲存 (Database)  + Flask-SQLAlchemy 的 ORM 框架
+
+ML : KNN
+
+參數有 : 
+
+1. 訓練集 (可以 call sklean 內建的 buildin_wine、buildin_iris)
+2. 要取幾個鄰居
+3. Feature 的資料 column 數目
+
+
+
+ ![AWS MLOps Framework | 參考架構圖](https://d1.awsstatic.com/Solutions/Solutions%20Category%20Template%20Draft/Solution%20Architecture%20Diagrams/AWS-MLOps-Framework.e8f367169c1c04f224501fb4858986b0eef1d9b2.jpg) 
+
 
 
 # 如何使用
@@ -23,24 +41,85 @@
 
 待完成 : 
 
-1. (傳入參數, 回傳的分數) 以此 pair 記錄至 DB 中，並且可以透過前端查詢
+1. Query DB 可以給予欄位篩選
 2. 提供更多對於 KNN 參數之調整
-   - 不同計算距離方式，加入至前端提供選擇
    - 可以上傳自己的 txt file
 
 
 
 已知可能 bug :
 
-1. 已有在 spark container 內串過了，需要把 ``import final`` 取消註解
-   和更改 ``test.KNN() -> final.KNN()``
-   不過 ``buildin_iris`` 的選項還沒跑過
+1. 網頁端執行參數不可為空。
 2. container 必須要有對應 port : ``-p 5678:5000``，
    且 container 內的 flask app 必須帶有參數 ``host='0.0.0.0'`` 才能正常在 host 吃到
-   (這個參數已經在 code 中了)
-3. 網頁端執行參數不可為空。
+   (這個參數已經在 code 中了，如果是用 docker-composer.xml build 也能內建 port 對應)
 
 
+
+# 新增 DB 過程
+
+```bash
+apt install mariadb-server
+#apt install systemd
+/etc/init.d/mysql status
+/etc/init.d/mysql start
+mariadb -u root -p
+create database traindb;
+use traindb;
+create table knn (
+  Rid int AUTO_INCREMENT,
+  Distance varchar(255),
+  Score float,
+  Neighbor int,
+  DatasetName varchar(255),
+  FeatureLen int,
+  Time datetime
+  PRIMARY KEY (Rid)
+);
+```
+
+```
+一些可能用到的指令
+show columns from Knn
+alter table Knn change column History Rid Integer primary key;
+service mysql restart
+alter table knn change Rid Rid int(11) AUTO_INCREMENT;
+service mysql start
+```
+
+
+
+![](https://i.imgur.com/gygUVol.png)
+
+
+
+
+
+```bash
+pip install pymysql sqlalchemy
+```
+
+## 如果遇到 "Access denied for user 'root'@'localhost'"
+
+- 最初我參考這篇 [ERROR 1698 (28000): Access denied for user 'root'@'localhost'](https://stackoverflow.com/questions/39281594/error-1698-28000-access-denied-for-user-rootlocalhost)
+  - 裡面有提到，在 Debian 系統 'auth_socket' 會被稱為 'unix_socket'。
+  - 我照做了一次，然後 root 就不能登入了 XD
+    狀態碼改成 ``(1045, "Access denied for user 'root'@'localhost' (using password: YES)")``
+- 遇到 (using password: YES) 這樣的，解決方式可以參考 [這篇](https://stackoverflow.com/questions/41818827/mysql-error-1045-access-denied-for-user-rootlocalhost-using-password/41821554)
+  - 但很尷尬的是裡面並沒有教怎麼 start MySQL with --skip-grant-tables
+    所以可以再參考 [這篇](https://stackoverflow.com/questions/1708409/how-to-start-mysql-with-skip-grant-tables)
+
+
+## 如果遇到 "Table 'traindb.train_model' doesn't exist")"
+
+在 Code 中，我的 Class 名稱叫做 train_model，
+後來發現這個 Class Name 代表的就是 Table Name。
+
+而當初在手動建立時，Table Name 叫做 Knn；
+我將 Class 改成 Knn 了卻還是找不到 ...。
+
+後來又發現，經過套件整合跑出來的指令都會是小寫，所以手動將 Table Name 改成 knn
+就有連上了。
 
 ------------------------------------
 

@@ -17,14 +17,25 @@ def turn_iris_to_sc(sc):
     table = list(map(lambda a, b: a+[b], iris['data'].tolist(), iris['target']))
     return sc.parallelize(table)
 
+def turn_wine_to_sc(sc):
+    from sklearn import datasets
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    wine = datasets.load_wine()
+    scaler.fit(wine['data'])
+    wine_std = scaler.transform(wine['data'])
+    #wine_target = wine['target']
+    table = list(map(lambda a, b: a+[b], wine_std.tolist(), wine['target']))
+    return sc.parallelize(table)
 
-def distanceAbs(training, test, numfields = 4):
-    ret = 0
-    #training = training.collect() #test = training.collect()
-    print
-    for i in range(numfields):
-        ret += abs(float(training[i])-float(test[i]))
-    return ret
+def turn_digits_to_sc(sc):
+    from sklearn import datasets
+    digits = datasets.load_digits()
+    digits_target = digits['target']
+    table = list(map(lambda a, b: a+[b], digits['data'].tolist(), digits['target']))
+    return sc.parallelize(table)
+
+
 
 def accuracy_score(test , li, k):
     ret = 0
@@ -41,8 +52,43 @@ def accuracy_score(test , li, k):
             return 0
     return 1
 
+class Distance_function(object):
+    def distanceAbs(training, test, numfields = 4):
+        # training :list   e.g. [0.1, 0.3, 0.4, 0.5]
 
-def KNN(input_data='./dis.txt',_numfields=4, _numNearestNeigbours=5 ):
+        ret = 0
+        #training = training.collect() #test = training.collect()
+        print
+        for i in range(numfields):
+            ret += abs(float(training[i])-float(test[i]))
+        return ret
+
+    def distanceEuc(training, test, numfields = 4):
+        import math
+        ret = 0
+        for i in range(numfields):
+            ret += (float(training[i])-float(test[i]))**2
+        return math.sqrt(ret)
+
+    def distanceChe(training, test, numfields = 4):
+        ret = 0
+        for i in range(numfields):
+            tmp = abs(float(training[i])-float(test[i]))
+            if tmp > ret:
+                ret = tmp
+        return ret
+
+    def distanceCos(training, test, numfields = 4):
+        import math
+        dot=sum(a*b for a, b in zip(training, test))
+        norm_training = math.sqrt(sum(a*a for a in training))
+        norm_test = math.sqrt(sum(b*b for b in test))
+        cos_sim = dot / (norm_training*norm_test)
+        ret = 1 - cos_sim
+        return ret
+
+
+def KNN(input_data='./dis.txt',_numfields=4, _numNearestNeigbours=5, distance_func='distanceAbs'):
 
     # prepare sc
     sc = pyspark.SparkContext()
@@ -51,27 +97,36 @@ def KNN(input_data='./dis.txt',_numfields=4, _numNearestNeigbours=5 ):
     # prepare data
     if input_data == 'buildin_iris':
         total_data = turn_iris_to_sc(sc)
+    elif input_data == 'buildin_wine':
+        total_data = turn_wine_to_sc(sc)
+    elif input_data == 'buildin_digits':
+        total_data = turn_digits_to_sc(sc)
     else:
         # url= './dis.txt'
         text_file = sc.textFile(input_data)
         total_data = text_file.map(lambda line: line.split(" "))
 
-    testset,trainingset = total_data.randomSplit([3,7], 10)
+    testset,trainingset = total_data.randomSplit([3,7], 10) # random seed
 
     numfields = _numfields # Feature columns
     numNearestNeigbours = _numNearestNeigbours # K
 
-    print("test set:", testset.collect(),"\n================\n")
+    print("[debug]: test set:", testset.collect(),"\n================\n")
 
     counts = testset.cartesian(trainingset) \
-    .map(lambda tt : (tt[0], distanceAbs(tt[0], tt[1], numfields), tt[1][4]))\
+    .map(lambda tt : (tt[0], getattr(Distance_function, distance_func)(tt[0], tt[1], numfields), tt[1][4]))\
     .map(lambda p: (tuple(p[0]), (p[1], p[2])) ) \
     .groupByKey().map(lambda p: (p[0], sorted(p[1]) ) )\
     .map( lambda t: accuracy_score(t[0], t[1], numNearestNeigbours))
 
-    print("[debug]: in final.py :", counts.collect())
+    print("[debug]: in final.py :", counts.collect()) # []
     ret = counts.collect()
+    score = 0
+    for i in ret:
+        score += i
+    score = float(score)/len(ret)
     sc.stop()
-    return ret
+    # 1, 'Some distance', 0.78, 5, '.dis.txt', 4, '01/05/2021, 15:43:28']
+    return [distance_func, score, _numNearestNeigbours, input_data, _numfields]
 
 #KNN()
