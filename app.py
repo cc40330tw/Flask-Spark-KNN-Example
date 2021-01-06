@@ -1,7 +1,6 @@
 from flask import Flask, render_template, url_for, jsonify, request
-# import translate, sentiment, synthesize
-import final
 #import test
+import final
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -72,11 +71,6 @@ def query_all_data():
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')
-	o = Knn.query.all()[0]
+	
 	#print(type(o.rid), type(o.distance), type(o.score), type(o.neighbor), type(o.datasetName), type(o.featureLen), type(o.timestamp))
 	
-	#p1 = Knn('Some distance', '0.78', 5, '.dis.txt', 4)
-	#print(p1.query.all()[0])
-	
-	#print(p1.query_by_rid(1))
-	#p1.save_to_db()

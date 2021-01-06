@@ -90,11 +90,6 @@ $(function() {
             queryTable.appendChild(table_row);
           }
 
-          // [[1, 'Some distance', 0.78, ...], [], [] ]
-          // for (var i = 0; i < data.length; i++) {
-          //   document.getElementById("query-result").textContent += ' ' +  data[i];
-          // }
-
         }
 
       });

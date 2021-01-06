@@ -126,7 +126,7 @@ def KNN(input_data='./dis.txt',_numfields=4, _numNearestNeigbours=5, distance_fu
         score += i
     score = float(score)/len(ret)
     sc.stop()
-    # 1, 'Some distance', 0.78, 5, '.dis.txt', 4, '01/05/2021, 15:43:28']
-    return [distance_func, score, _numNearestNeigbours, input_data, _numfields]
+    
+    return [distance_func, score, _numNearestNeigbours, input_data, _numfields] # ['Some distance', 0.78, 5, '.dis.txt', 4]
 
 #KNN()
